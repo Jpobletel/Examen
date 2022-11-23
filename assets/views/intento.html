@@ -1,0 +1,35 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Visualizacion</title>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <link rel="stylesheet" href="../css/style.css">
+    </head>
+    <body>
+        <form>
+            <input type="radio" id="2017" name="year" value="2017" checked>
+            <label for="year">2017</label>
+            <input type="radio" id="2018" name="year" value="2018">
+            <label for="year">2018</label>
+            <input type="radio" id="2019" name="year" value="2019">
+            <label for="year">2019</label>
+            <input type="radio" id="2020" name="year" value="2020">
+            <label for="year">2020</label>
+            <input type="radio" id="2021" name="year" value="2021">
+            <label for="year">2021</label>
+          </form>
+          <label for="nRadius">
+         radius = <span id="nRadius-value">...</span>
+  </label>
+  <input type="range" min="3" max="15" id="nRadius">
+        <div class="container">
+            <div id="vis-1">
+            </div>
+            <div id="vis-2">
+            </div>
+        </div>
+        
+        <script src="../js/data.js"></script>
+    </body>
+</html>
