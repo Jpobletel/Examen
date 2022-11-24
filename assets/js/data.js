@@ -70,6 +70,7 @@ function createVis(data){
     UpdateData(rankNumber)  
 }
     
+    
     var SVG = d3.select("#vis-1")
     .append("svg")
     .attr('width',  960)
@@ -90,6 +91,7 @@ function createVis(data){
     var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip");
 
+    var songsMetrics = []
 
     function UpdateData(rows){
         var yearData = filteredData.filter(row => row.week.includes("2021") && parseInt(row.rank)<=rows)
@@ -194,7 +196,7 @@ function createVis(data){
                     "<br/>" + "Album: " + fila.album_name +
                     "<br/>" + "Artists: " + fila.artist_names +
                     "<br/>" +
-                    "<image witdh=100 height = 100>"+ fila.album_img  +"</image>";
+                    "<image witdh=100 height = 100 src="+ fila.album_img  +" ></image>";
     
             tooltip.html(tooltip_str)
                 .style("visibility", "visible");
@@ -209,12 +211,19 @@ function createVis(data){
     
             tooltip.style("visibility", "hidden");
         })
-        .on('click', function(d, fila ) {
+        .on('click', function(_, fila ) {
+            i=true
+            let currSong
             contenedorVis.selectAll('.a' + fila.track_id.toLowerCase().replace(/ /g, '-').replace(/\./g,''))
                 .classed('click-active', function(d) {
-                // toggle state
+
+                if (i) {
+                    currSong = fila
+                    i = false
+                }
                 return !d3.select(this).classed('click-active');
                 });
+            DisplayMetrics(currSong)
         })
 
     }
@@ -283,7 +292,7 @@ function createVis(data){
         )))
         coordinates.push((angleToCoordinate(
             (Math.PI / 2) + (2 * Math.PI * 3 / metricas.length),
-            data_point.speechiness* 1000
+            data_point.speechiness* 100
         )))
         coordinates.push((angleToCoordinate(
             (Math.PI / 2) + (2 * Math.PI * 4 / metricas.length),
@@ -303,27 +312,50 @@ function createVis(data){
     .x(d => d.x)
     .y(d => d.y);
 
-    var songsMetrics = [yearData[40]]
-    function DisplayMetrics(songsMetrics){
+    function DisplayMetrics(song){
+
+        if (songsMetrics.length === 0) {
+            songsMetrics.push(song)
+        } 
+
+        else{
+            thing = songsMetrics.map(function(d){
+                if (song.track_id === d.track_id){
+                    return d
+                }
+                else return "nothing"
+            })
+
+            if (thing==="nothing"){
+                if (songsMetrics.length < 3) {
+                    songsMetrics.push(song)
+                }
+            }
+            else{
+                indexa = songsMetrics.indexOf(thing)
+                songsMetrics.splice(indexa, 1);
+            }
+        }
+
+        console.log(songsMetrics)
+
         songsMetrics.map(function(d) {
             let songId = d.track_id
             let img = d.album_img
             let coordinates = getPathCoordinates(d);
-
-            console.log(coordinates)
             //draw the path element
             svg2.append("path")
             .data([coordinates])
+            .join()
             .attr("d",line)
             .attr("stroke-width", 3)
             .attr("stroke", function(d) { return colors[songId]})
             .attr("fill", function(d) { return colors[songId]})
             .attr("stroke-opacity", 1)
-            .attr("opacity", 0.5); b
-            svg2.append("image").attr("href", img).attr("width", 500).attr("height", 500)
+            .attr("opacity", 0.5);
+            // svg2.append("image").attr("href", img).attr("width", 500).attr("height", 500)
         })
     }
-    DisplayMetrics(songsMetrics)
 
 
     
