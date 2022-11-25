@@ -2,6 +2,17 @@ body{
   background-color: #3B3B3B;
 }
 
+.titulo{
+  text-align:center;
+  color: #fff;
+  
+}
+.container{
+  margin: 0 auto;
+  justify-content: center;
+  text-align: center;
+}
+
 .click-active, .active {
   opacity: 1.0;
   stroke-opacity: 1.0;
@@ -18,24 +29,24 @@ path.active {
 }
 
 .axis text {
-  font: 10px sans-serif;
+  font: 15px sans-serif;
+  color: #fff;
 }
 
 .axis path,
 .axis line {
   fill: none;
-  stroke: #000;
+  stroke: #fff;
+  color: #fff;
+
   shape-rendering: crispEdges;
 }
 
-.x.axis path {
-  display: none;
-}
 
 .tooltip {
   position: absolute;
   padding: 10px;
-  font: 12px sans-serif;
+  font: 15px sans-serif;
   background: #222;
   color: #fff;
   border: 0px;

@@ -74,11 +74,18 @@ function createVis(data){
     var SVG = d3.select("#vis-1")
     .append("svg")
     .attr('width',  960)
-    .attr('height',  600)
+    .attr('height',  500)
+    .attr("class", "svg")
     .append("g")
     .attr("class", "todo")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+    // containers = d3.select(".svg").call( d3.brush()                     // Add the brush feature using the d3.brush function
+    // .extent( [ [70,40], [900,360] ] )
+    // .on("brush", function(f, i){
+    //     console.log(f.selection)
+    // })       // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+//   )
     SVG
     .append("clipPath")
     .attr("id", "clip")
@@ -227,13 +234,32 @@ function createVis(data){
         })
 
     }
+    const manejadorZoom = (evento) => {
+        const transformacion = evento.transform;
+    
+        contenedorVis.attr("transform", transformacion);
+    
+        // Ajustamos escalas. Esta función solo sirve con escalas continuas
+
+    
+        // Actualizamos las escalas en la visualización
+        contenedorX.call(xAxis.scale(x));
+        contenedorY.call(yAxis.scale(escalaY2));
+      };
+    const zoom = d3.zoom()
+      .scaleExtent([0.5, 2])
+      .extent([[0, 0], [width, height]])
+      .translateExtent([[0, 0], [width, height]])
+      .on("zoom", manejadorZoom)
+
+      contenedorVis.call(zoom)
 
     // SEGUNDA VISUALIZACION
 
     var svg2 = d3.select("#vis-2")
     .append("svg")
-    .attr('width',  960)
-    .attr('height',  600)
+    .attr('width',  650)
+    .attr('height',  650)
 
    let radialScale = d3.scaleLinear()
     .domain([0,100])
@@ -319,42 +345,57 @@ function createVis(data){
         } 
 
         else{
-            thing = songsMetrics.map(function(d){
+            thing = false
+            songsMetrics.map(function(d){
                 if (song.track_id === d.track_id){
-                    return d
+                    thing = true
                 }
-                else return "nothing"
+                return false
             })
+            console.log(thing)
 
-            if (thing==="nothing"){
+
+
+            if (!thing){
                 if (songsMetrics.length < 3) {
                     songsMetrics.push(song)
                 }
             }
             else{
-                indexa = songsMetrics.indexOf(thing)
+                SongID = songsMetrics.map(function(d){
+                    if (song.track_id === d.track_id){
+                        return d
+                    }
+                })
+                indexa = songsMetrics.indexOf(SongID)
                 songsMetrics.splice(indexa, 1);
             }
+
         }
-
         console.log(songsMetrics)
+        var coordinates = songsMetrics.map(x => getPathCoordinates(x))
+        console.log(coordinates)
 
-        songsMetrics.map(function(d) {
-            let songId = d.track_id
-            let img = d.album_img
-            let coordinates = getPathCoordinates(d);
-            //draw the path element
-            svg2.append("path")
-            .data([coordinates])
-            .join()
-            .attr("d",line)
-            .attr("stroke-width", 3)
-            .attr("stroke", function(d) { return colors[songId]})
-            .attr("fill", function(d) { return colors[songId]})
-            .attr("stroke-opacity", 1)
-            .attr("opacity", 0.5);
-            // svg2.append("image").attr("href", img).attr("width", 500).attr("height", 500)
-        })
+        svg2.selectAll("path")
+            .data(coordinates)
+            .join(enter =>
+                enter.append("path")
+                .attr("d",line)
+                .attr("stroke-width", 3)
+                .attr("stroke", function(_, index) {
+                    return colors[songsMetrics[index].track_id]
+                })
+                .attr("fill", function(_, index) { return colors[songsMetrics[index].track_id]})
+                .attr("stroke-opacity", 1)
+                .attr("opacity", 0.5),
+                update => update, // Esto es para acceder a la función de exit que es la tercera
+                exit => exit // Transicion para eliminar elegamentement las barras
+                  .transition()
+                  .duration(500)
+                  .attr("y", height)
+                  .attr("height", 0)
+                  .remove()
+                )
     }
 
 
